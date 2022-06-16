@@ -13,7 +13,8 @@ const userSchema = mongoose.Schema({
     },
 
     birthday: {
-       date: Number,
+       type: Date,
+       required: true
     },
 
     age: {
@@ -32,4 +33,4 @@ const userSchema = mongoose.Schema({
     }
 })
 
-module.exports =  mongoose.model('User', userSchema)
+module.exports =  mongoose.model('user', userSchema)

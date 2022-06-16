@@ -1,47 +1,53 @@
 const express = require('express')
-const UserModel = require('../models/usersSchema')
+const UserModel = require('../Models/userSchema')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const router = express.Router()
+const middleware = require('../Middleware/authmiddleware')
 
-//* Create or Register a new User
-router.post('/', [
-    check('username', "Username is required from Middleware!").notEmpty(),
-    check("email", "Please use a valid email! from middleware").isEmail(),
-    check("password", "Please enter a password").notEmpty(),
-    check("password", "Please enter a password with six or more characters").isLength({min: 6}),
-] ,async (req, res) => {
-    const userData = req.body
+
+router.get('/', middleware, async (req,res) => {
+ 
     try {
-    
-        const userExist = await UserModel.findOne({email: userData.email})
-        if (userExist) {
-            return res.json({msg: "You already exist!"})
-        }
-
-
-        const SALT = await bcrypt.genSalt(12)
-        const hashedPassword = await bcrypt.hash(userData.password, SALT)
-        userData.password = hashedPassword
-        const user = await UserModel.create(userData)
-
-
-        const payload = {
-            id: user._id,
-            email: user.email
-        }
-
-        const TOKEN = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "2 Days"})
-
-        res.status(201).json({
-            user: user,
-            token: TOKEN
-        })
-        
+       const users = await UserModel.find()
+       res.status(200).json(users)
     } catch (error) {
-        console.log(error)
-        res.status(400).json('Bad request!!!!!')
+      console.log(error);
+    }
+  })
+
+  router.get('/:id', middleware, async (req,res) => {
+    const id = req.params.id
+
+    try {
+      const user = await UserModel.findById(id)
+      res.status(200).json(user)  
+    } catch (error) {
+        console.error(error);
     }
 })
+
+
+
+
+router.post('/',middleware, async (req, res) => {
+    const userData = req.body
+    try {
+      const user = await UserModel.create(userData)
+      res.status(200).json(user)  
+    } catch (error) {
+        res.status(400).json('You already created one')
+    }
+})
+
+router.delete('/:id', middleware, async (req,res) => {
+  const id =req.params.id
+  try {
+      const user = await UserModel.findByIdAndDelete(id)
+      res.status(204).json(user)
+  } catch (error) {
+     console.error(error); 
+  }
+ })
 
 module.exports = router
