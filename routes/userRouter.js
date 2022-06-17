@@ -30,7 +30,7 @@ router.get('/', middleware, async (req,res) => {
 
 
 
-router.post('/',middleware, async (req, res) => {
+router.post('/', async (req, res) => {
     const userData = req.body
     try {
       const user = await UserModel.create(userData)
@@ -38,6 +38,31 @@ router.post('/',middleware, async (req, res) => {
     } catch (error) {
         res.status(400).json('You already created one')
     }
+
+     //* ==== Create New User
+        // 1 Create the salt
+        const SALT = await bcrypt.genSalt(12)
+        // 2 use the salt to create a hash with the user's password
+        const hashedPassword = await bcrypt.hash(userData.password, SALT)
+        // 3 assign the hashed password to the userData
+        userData.password = hashedPassword
+        // Write the user to the db
+        const user = await UserModel.create(userData)
+
+        //* create a new JWT Token
+
+        const payload = {
+            id: user._id,
+            email: user.email
+        }
+
+        const TOKEN = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "2 Days"})
+
+        res.status(201).json({
+            user: user,
+            token: TOKEN
+        })
+        
 })
 
 router.delete('/:id', middleware, async (req,res) => {
@@ -51,3 +76,5 @@ router.delete('/:id', middleware, async (req,res) => {
  })
 
 module.exports = router
+
+
