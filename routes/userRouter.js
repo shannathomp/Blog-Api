@@ -6,7 +6,7 @@ const router = express.Router()
 const middleware = require('../Middleware/authmiddleware')
 
 
-router.get('/', middleware, async (req,res) => {
+router.get('/', async (req,res) => {
  
     try {
        const users = await UserModel.find()
@@ -16,7 +16,7 @@ router.get('/', middleware, async (req,res) => {
     }
   })
 
-  router.get('/:id', middleware, async (req,res) => {
+  router.get('/:id', async (req,res) => {
     const id = req.params.id
 
     try {
@@ -33,6 +33,7 @@ router.get('/', middleware, async (req,res) => {
 router.post('/', async (req, res) => {
     const userData = req.body
     try {
+      
       const user = await UserModel.create(userData)
       res.status(200).json(user)  
     } catch (error) {
