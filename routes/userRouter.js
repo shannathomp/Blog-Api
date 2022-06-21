@@ -1,12 +1,12 @@
 const express = require('express')
 const UserModel = require('../Models/userSchema')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+// const jwt = require('jsonwebtoken')
 const router = express.Router()
 const middleware = require('../Middleware/authmiddleware')
 
 
-router.get('/', async (req,res) => {
+router.get('/',  async (req,res) => {
  
     try {
        const users = await UserModel.find()
@@ -16,7 +16,7 @@ router.get('/', async (req,res) => {
     }
   })
 
-  router.get('/:id', async (req,res) => {
+  router.get('/:id', middleware, async (req,res) => {
     const id = req.params.id
 
     try {
@@ -33,40 +33,22 @@ router.get('/', async (req,res) => {
 router.post('/', async (req, res) => {
     const userData = req.body
     try {
-      
+      const userExist = await UserModel.findOne({email: userData.email})
+
+      if (userExist){
+        return res.json({msg: 'User already exist'})
+      }
+      const SALT = await bcrypt.genSalt(12)
+      const hashedPassword = await bcrypt.hash(userData.password, SALT)
+userData.password = hashedPassword
       const user = await UserModel.create(userData)
       res.status(200).json(user)  
     } catch (error) {
         res.status(400).json('You already created one')
     }
-
-     //* ==== Create New User
-        // 1 Create the salt
-        const SALT = await bcrypt.genSalt(12)
-        // 2 use the salt to create a hash with the user's password
-        const hashedPassword = await bcrypt.hash(userData.password, SALT)
-        // 3 assign the hashed password to the userData
-        userData.password = hashedPassword
-        // Write the user to the db
-        const user = await UserModel.create(userData)
-
-        //* create a new JWT Token
-
-        const payload = {
-            id: user._id,
-            email: user.email
-        }
-
-        const TOKEN = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "2 Days"})
-
-        res.status(201).json({
-            user: user,
-            token: TOKEN
-        })
-        
 })
 
-router.delete('/:id', middleware, async (req,res) => {
+router.delete('/:id', async (req,res) => {
   const id =req.params.id
   try {
       const user = await UserModel.findByIdAndDelete(id)

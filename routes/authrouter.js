@@ -1,5 +1,4 @@
 const express = require('express')
-const {check, validationResult} = require('express-validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const UserModel = require('../Models/userSchema')
@@ -7,10 +6,7 @@ const UserModel = require('../Models/userSchema')
 const router = express.Router()
 
 //* User Login
-router.post('/',[
-    check("email", "Please provide a valid email").isEmail(),
-    check("password", "Check your password!").notEmpty()
-] , async (req, res) => {
+router.post('/', async (req, res) => {
     const userData = req.body
 
 
@@ -27,7 +23,7 @@ router.post('/',[
         if (!isMatch){
             return res.json('Password is not a match!')
         }
-
+// res.status(200).json('success!')
 
        const payload = {
         id: user._id,

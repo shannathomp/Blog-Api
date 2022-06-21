@@ -1,11 +1,11 @@
 const express = require('express')
 const blogModel = require('../Models/blogSchema')
 const router = express.Router()
-const middleware = require('../Middleware/authmiddleware')
+// const middleware = require('../Middleware/authmiddleware')
 
 
 
-router.get('/',middleware, async (req,res) => {
+router.get('/', async (req,res) => {
     try {
        const blogs = await blogModel.find()
        res.status(200).json(blogs) 
@@ -14,7 +14,7 @@ router.get('/',middleware, async (req,res) => {
     }
     })
 
-    router.post('/', middleware, async (req,res) => {
+    router.post('/', async (req,res) => {
         const blogData = req.body
         
         
@@ -27,7 +27,7 @@ router.get('/',middleware, async (req,res) => {
         }
         })
 
-        router.get('/:id', middleware, async (req,res) => {
+        router.get('/:id', async (req,res) => {
             const id = req.params.id
         
             try {
@@ -38,7 +38,7 @@ router.get('/',middleware, async (req,res) => {
             }
         })
 
-        router.put('/:id', middleware, async (req,res) => {
+        router.put('/:id', async (req,res) => {
             const id = req.params.id
             const newData = req.body
             try {
@@ -49,7 +49,7 @@ router.get('/',middleware, async (req,res) => {
             }
         })
 
-        router.delete('/:id',middleware, async (req,res) => {
+        router.delete('/:id', async (req,res) => {
          const id =req.params.id
          try {
              const blog = await blogModel.findByIdAndDelete(id)
