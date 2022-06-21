@@ -7,7 +7,7 @@ This blog Api is just a backend database created for storage of users. Api just 
 bcrypt, dotenv, express, jsonwebtoken, mongoose, morgan, helmet.
 
 ## Main Features
-<img src= './images/Untitled1.png' width = '100'>
+<img src= './images/Untitled1.png' width = '500'>
 ![](./images/Untitled1.png)
 
 
